@@ -1,82 +1,90 @@
 import streamlit as st
+import random
 import time
 
-# --- إعدادات الواجهة الاحترافية ---
-st.set_page_config(page_title="WePlay Pro", page_icon="🎮", layout="centered")
+# --- إعدادات متقدمة للواجهة ---
+st.set_page_config(page_title="WePlay Ultimate", page_icon="👑", layout="wide")
 
-# --- CSS لتصميم مبهر (ألوان جذابة وأزرار مودرن) ---
+# ستايل CSS احترافي بألوان النيون (Neon UI)
 st.markdown("""
     <style>
-    .main { background: linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%); color: white; }
-    .stButton>button {
-        background: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%);
-        color: white; border: none; padding: 15px 30px;
-        border-radius: 50px; font-weight: bold; transition: 0.3s;
-        box-shadow: 0px 4px 15px rgba(0, 219, 222, 0.4);
-    }
-    .stButton>button:hover { transform: scale(1.05); box-shadow: 0px 6px 20px rgba(252, 0, 255, 0.6); }
-    .card { background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 20px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; margin-bottom: 20px; }
-    h1, h2, h3 { font-family: 'Inter', sans-serif; background: -webkit-linear-gradient(#eee, #333);
-                 -webkit-background-clip: text; }
+    .stApp { background: #0b0e14; color: #e0e0e0; }
+    .vip-card { background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%); padding: 10px; border-radius: 10px; color: black; font-weight: bold; text-align: center; }
+    .game-card { background: #1a1c24; border: 2px solid #333; padding: 20px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+    .stButton>button { background: linear-gradient(90deg, #00d2ff, #3a7bd5); border: none; color: white; border-radius: 30px; transition: 0.3s; }
+    .stButton>button:hover { transform: scale(1.05); box-shadow: 0 0 15px #00d2ff; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- التنقل بين الصفحات ---
-if 'step' not in st.session_state:
-    st.session_state.step = "welcome"
+# --- إدارة الحالة (Data State) ---
+if 'points' not in st.session_state: st.session_state.points = 0
+if 'level' not in st.session_state: st.session_state.level = 1
 
-# --- الصفحة 1: الترحيب والجذب ---
-if st.session_state.step == "welcome":
-    st.markdown("<h1 style='text-align: center; color: #00dbde;'>🎮 WEPLAY NEON</h1>", unsafe_allow_html=True)
-    st.markdown("<div class='card'><h3>مرحباً بك في عالم الألعاب الجماعية! 🚀</h3><p>استعد لتجربة مليئة بالحماس والغموض مع أصدقائك.</p></div>", unsafe_allow_html=True)
-    
-    if st.button("دخول الغرفة السرية ✨"):
-        st.session_state.step = "avatar"
-        st.rerun()
+# --- القائمة الجانبية (بروفايل اللاعب) ---
+with st.sidebar:
+    st.markdown("<div class='vip-card'>🌟 VIP PLAYER</div>", unsafe_allow_html=True)
+    st.image(f"https://api.dicebear.com/7.x/avataaars/svg?seed={st.session_state.get('my_name', 'Guest')}", width=100)
+    st.subheader(f"الاسم: {st.session_state.get('my_name', 'زائر')}")
+    st.write(f"🏆 النقاط: {st.session_state.points}")
+    st.write(f"🆙 المستوى: {st.session_state.level}")
+    st.progress(min(st.session_state.points % 100 / 100, 1.0))
 
-# --- الصفحة 2: تخصيص الشخصية (Colors & Style) ---
-elif st.session_state.step == "avatar":
-    st.title("🎨 صمم شخصيتك الجذابة")
-    col1, col2 = st.columns([1, 1])
-    
-    with col1:
-        color = st.color_picker("اختر لون طاقتك الخاص", "#fc00ff")
-        cloth = st.selectbox("نوع الزي", ["زي المحارب", "زي القاتل الصامت", "الملك"])
-    
-    with col2:
-        st.markdown(f"""
-            <div style='background: {color}; width: 150px; height: 150px; border-radius: 50%; 
-            margin: auto; border: 5px solid white; box-shadow: 0 0 20px {color};'>
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Lucky" style="width:100%"/>
-            </div>
-            <p style='text-align:center; margin-top:10px;'>زي: {cloth}</p>
-        """, unsafe_allow_html=True)
-    
-    if st.button("اعتماد الشخصية والانطلاق 🚀"):
-        st.session_state.step = "game"
-        st.rerun()
+# --- المحتوى الرئيسي ---
+if 'my_name' not in st.session_state:
+    st.title("🛡️ WePlay Ultimate")
+    name = st.text_input("ادخل اسمك الأسطوري:")
+    if st.button("دخول العالم 🌍"):
+        if name:
+            st.session_state.my_name = name
+            st.rerun()
+else:
+    tab1, tab2, tab3 = st.tabs(["🎮 الألعاب", "🎨 لوحة الرسم", "🎁 المتجر والهدايا"])
 
-# --- الصفحة 3: اللعبة (Logic) ---
-elif st.session_state.step == "game":
-    st.title("🕵️ لعبة WeParty (من القاتل؟)")
-    
-    with st.spinner('جاري توزيع الأدوار سرياً...'):
-        time.sleep(1)
-    
-    st.markdown("""
-        <div class='card'>
-            <h2 style='color: #ff4b4b;'>⚠️ انتباه!</h2>
-            <p>لقد تم إرسال دورك في الرسالة المشفرة بالأسفل.</p>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    with st.expander("اضغط هنا لكشف دورك السري"):
-        role = "القاتل (Killer) 🔪"
-        st.error(f"دورك هو: {role}")
-        st.info("مهمتك: اقنع الجميع أنك مواطن بريء عبر الدردشة الصوتية!")
+    # --- تبويب الألعاب ---
+    with tab1:
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("<div class='game-card'>", unsafe_allow_html=True)
+            st.subheader("🕵️ WeParty")
+            if st.button("كشف دوري السري"):
+                role = random.choice(["القاتل المرعب 🔪", "المحقق الذكي 🔍", "مواطن مسالم 😇"])
+                st.toast(f"تم تحديد دورك: {role}")
+                st.success(f"أنت الآن: {role}")
+            st.markdown("</div>", unsafe_allow_html=True)
 
-    if st.button("العودة للرئيسية"):
-        st.session_state.step = "welcome"
-        st.rerun()
-        
+        with col2:
+            st.markdown("<div class='game-card'>", unsafe_allow_html=True)
+            st.subheader("🎲 حجر الحظ")
+            if st.button("ارمي الحجر"):
+                num = random.randint(1, 6)
+                st.write(f"الرقم هو: {num}")
+                if num == 6:
+                    st.session_state.points += 20
+                    st.balloons()
+                    st.success("مبروك! حصلت على 20 نقطة مكافأة!")
+            st.markdown("</div>", unsafe_allow_html=True)
+
+    # --- تبويب الرسم (تفاعلي) ---
+    with tab2:
+        st.subheader("🖍️ مساحة الإبداع (ارسم وتوقع)")
+        st.info("هذه المساحة مخصصة لمشاركة الرسومات مع أصدقائك في الغرفة")
+        color = st.sidebar.color_picker("لون القلم", "#00d2ff")
+        st.write("استخدم أدوات المتصفح للرسم ومشاركة الشاشة مع أصدقائك!")
+        # ملاحظة: يمكن إضافة مكتبة streamlit-drawable-canvas هنا لاحقاً
+
+    # --- تبويب الهدايا (VIP) ---
+    with tab3:
+        st.subheader("💎 متجر الهدايا الخاصة")
+        g1, g2, g3 = st.columns(3)
+        with g1:
+            if st.button("💍 خاتم ملكي"): st.snow()
+        with g2:
+            if st.button("👑 تاج ذهبي"): st.balloons()
+        with g3:
+            if st.button("🚀 صاروخ شهرة"): st.toast("لقد لفت انتباه الجميع!")
+
+# --- تحديث النقاط تلقائياً ---
+if st.session_state.points >= st.session_state.level * 100:
+    st.session_state.level += 1
+    st.sidebar.confetti()
+            
