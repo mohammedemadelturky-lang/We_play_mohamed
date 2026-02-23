@@ -1,0 +1,81 @@
+import streamlit as st
+import time
+
+# --- إعدادات الواجهة الاحترافية ---
+st.set_page_config(page_title="WePlay Pro", page_icon="🎮", layout="centered")
+
+# --- CSS لتصميم مبهر (ألوان جذابة وأزرار مودرن) ---
+st.markdown("""
+    <style>
+    .main { background: linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%); color: white; }
+    .stButton>button {
+        background: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%);
+        color: white; border: none; padding: 15px 30px;
+        border-radius: 50px; font-weight: bold; transition: 0.3s;
+        box-shadow: 0px 4px 15px rgba(0, 219, 222, 0.4);
+    }
+    .stButton>button:hover { transform: scale(1.05); box-shadow: 0px 6px 20px rgba(252, 0, 255, 0.6); }
+    .card { background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 20px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; margin-bottom: 20px; }
+    h1, h2, h3 { font-family: 'Inter', sans-serif; background: -webkit-linear-gradient(#eee, #333);
+                 -webkit-background-clip: text; }
+    </style>
+    """, unsafe_allow_html=True)
+
+# --- التنقل بين الصفحات ---
+if 'step' not in st.session_state:
+    st.session_state.step = "welcome"
+
+# --- الصفحة 1: الترحيب والجذب ---
+if st.session_state.step == "welcome":
+    st.markdown("<h1 style='text-align: center; color: #00dbde;'>🎮 WEPLAY NEON</h1>", unsafe_allow_html=True)
+    st.markdown("<div class='card'><h3>مرحباً بك في عالم الألعاب الجماعية! 🚀</h3><p>استعد لتجربة مليئة بالحماس والغموض مع أصدقائك.</p></div>", unsafe_allow_html=True)
+    
+    if st.button("دخول الغرفة السرية ✨"):
+        st.session_state.step = "avatar"
+        st.rerun()
+
+# --- الصفحة 2: تخصيص الشخصية (Colors & Style) ---
+elif st.session_state.step == "avatar":
+    st.title("🎨 صمم شخصيتك الجذابة")
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        color = st.color_picker("اختر لون طاقتك الخاص", "#fc00ff")
+        cloth = st.selectbox("نوع الزي", ["زي المحارب", "زي القاتل الصامت", "الملك"])
+    
+    with col2:
+        st.markdown(f"""
+            <div style='background: {color}; width: 150px; height: 150px; border-radius: 50%; 
+            margin: auto; border: 5px solid white; box-shadow: 0 0 20px {color};'>
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Lucky" style="width:100%"/>
+            </div>
+            <p style='text-align:center; margin-top:10px;'>زي: {cloth}</p>
+        """, unsafe_allow_html=True)
+    
+    if st.button("اعتماد الشخصية والانطلاق 🚀"):
+        st.session_state.step = "game"
+        st.rerun()
+
+# --- الصفحة 3: اللعبة (Logic) ---
+elif st.session_state.step == "game":
+    st.title("🕵️ لعبة WeParty (من القاتل؟)")
+    
+    with st.spinner('جاري توزيع الأدوار سرياً...'):
+        time.sleep(1)
+    
+    st.markdown("""
+        <div class='card'>
+            <h2 style='color: #ff4b4b;'>⚠️ انتباه!</h2>
+            <p>لقد تم إرسال دورك في الرسالة المشفرة بالأسفل.</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    with st.expander("اضغط هنا لكشف دورك السري"):
+        role = "القاتل (Killer) 🔪"
+        st.error(f"دورك هو: {role}")
+        st.info("مهمتك: اقنع الجميع أنك مواطن بريء عبر الدردشة الصوتية!")
+
+    if st.button("العودة للرئيسية"):
+        st.session_state.step = "welcome"
+        st.rerun()
